@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talents 2025 Dashboard — Public</title>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --blue: #0d47a1;
+      --red: #c62828;
+      --gold: #d4af37;
+      --bg: #f5f7fa;
+      --text: #1f2937;
+      --white: #ffffff;
+      --muted: #e5e7eb;
+      --shadow: 0 6px 18px rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    header { background: var(--blue); color: var(--white); padding: 1rem; text-align: center; box-shadow: var(--shadow); }
+    header h1 { margin: 0 0 .25rem 0; font-size: clamp(1.2rem, 4vw, 1.8rem); }
+    header small { color: var(--gold); }
+    .top-total { text-align: center; font-weight: 700; margin: .25rem auto 1rem; color: var(--blue); }
+    .top-total span { background: linear-gradient(90deg, #ffe08a, #ffd04d); padding: .35rem .6rem; border-radius: .5rem; color: #111; display: inline-block; box-shadow: var(--shadow); }
+    nav { display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap; padding: .75rem 1rem 1rem; }
+    nav button { border: none; border-radius: 9999px; padding: .6rem 1rem; font-size: 1rem; background: var(--gold); color: #111; cursor: pointer; transition: all .15s ease-in-out; }
+    nav button.active, nav button:hover { background: var(--red); color: var(--white); }
+    main { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+    section.card { background: var(--white); border-radius: .75rem; box-shadow: var(--shadow); padding: 1rem; margin-bottom: 1.5rem; }
+    h2 { color: var(--blue); margin-top: 0; }
+    .hidden { display: none !important; }
+    form { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .75rem 1rem; margin-bottom: 1rem; }
+    form label { display: flex; flex-direction: column; font-weight: 600; font-size: .9rem; }
+    input[type="text"], input[type="number"], input[type="date"], select { margin-top: .35rem; padding: .6rem .7rem; border: 1px solid var(--muted); border-radius: .375rem; font-size: 1rem; }
+    button.primary { grid-column: 1 / -1; background: var(--blue); color: var(--white); border: none; border-radius: .375rem; padding: .75rem 1rem; cursor: pointer; font-weight: 600; }
+    .export-buttons { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin: .5rem 0 1rem; }
+    .export-buttons button { background: var(--red); color: var(--white); border: none; border-radius: .375rem; padding: .5rem .9rem; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; background: var(--white); border-radius: .5rem; overflow: hidden; }
+    thead th { background: var(--blue); color: var(--white); padding: .65rem; text-align: left; font-size: .9rem; }
+    tbody td { border-bottom: 1px solid var(--muted); padding: .6rem; font-size: .9rem; }
+    tbody tr:hover { background: #fafafa; }
+    .admin-pill { display: inline-flex; align-items: center; gap: .35rem; background: #fff7f7; color: var(--red); padding: .25rem .5rem; border-radius: 9999px; font-size: .75rem; margin-left: .5rem; }
+    @media(max-width: 640px){ table thead { display: none; } table, tbody, tr, td { display: block; width: 100%; } tbody tr { margin-bottom: .75rem; box-shadow: var(--shadow); border-radius: .5rem; overflow: hidden; } tbody td { border: none; display: flex; justify-content: space-between; padding: .5rem .75rem; } tbody td::before { content: attr(data-label); font-weight: 600; color: var(--blue); padding-right: .5rem; } }
+  </style>
+
+</head>
+<body>
+  <header>
+    <h1>Talents 2025 — FIF Ministries, Dallas City Assembly</h1>
+    <div id="top-total" class="top-total"></div>
+  </header>
+
+  <nav>
+    <button id="tab-leaderboard" class="active" onclick="showTab('leaderboard')">Leaderboard</button>
+    <button id="tab-weekly" onclick="showTab('weekly')">Weekly Totals</button>
+    <button id="tab-raw" onclick="showTab('raw')">Raw Data (View Only)</button>
+  </nav>
+
+  <main>
+    <!-- Leaderboard -->
+    <section id="leaderboard" class="card">
+      <h2>Leaderboard</h2>
+      <div class="export-buttons">
+        <button onclick="exportTableToCSV('Leaderboard.csv','leaderboard-table')">Export Leaderboard to CSV</button>
+      </div>
+      <table id="leaderboard-table">
+        <thead><tr><th>Rank</th><th>Name</th><th>Total Contribution ($)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Weekly Totals -->
+    <section id="weekly" class="card hidden">
+      <h2>Weekly Totals</h2>
+      <div class="export-buttons">
+        <button onclick="exportTableToCSV('WeeklyTotals.csv','weekly-totals-table')">Export Weekly Totals to CSV</button>
+      </div>
+      <table id="weekly-totals-table">
+        <thead><tr><th>Week Start</th><th>Week End</th><th>Week Label</th><th>Total Amount ($)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Raw Data (View Only) -->
+    <section id="raw" class="card hidden">
+      <h2>Raw Data (View Only)</h2>
+      <div class="export-buttons">
+        <button onclick="exportTableToCSV('RawData.csv','raw-data-table')">Export Raw Data to CSV</button>
+      </div>
+      <table id="raw-data-table">
+        <thead><tr><th>Date</th><th>Week Start</th><th>Week End</th><th>Week Label</th><th>Name</th><th>Amount</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    // Public page (no editing)
+    let rawData = JSON.parse(localStorage.getItem('contributionsRawData')) || [];
+    if (!rawData.length) { rawData = __SEED__; localStorage.setItem('contributionsRawData', JSON.stringify(rawData)); }
+
+    // Shared helpers
+    function saveToLocalStorage(){ localStorage.setItem('contributionsRawData', JSON.stringify(rawData)); }
+    function formatDate(date){ return date.toISOString().slice(0, 10); }
+    function getWeekRange(dateStr){
+      const date = new Date(dateStr);
+      let day = date.getDay(); day = (day === 0) ? 7 : day; // Sunday -> 7
+      const monday = new Date(date); monday.setDate(date.getDate() - (day - 1));
+      const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+      return { weekStart: formatDate(monday), weekEnd: formatDate(sunday), weekLabel: `Week of ${formatDate(monday)}` };
+    }
+    function currency(n){ return `$${n.toFixed(2)}`; }
+    function updateTotalRaised(){
+      const total = rawData.reduce((s, r) => s + (r.Amount || 0), 0);
+      const el = document.getElementById('top-total');
+      if (el) el.innerHTML = `<span>Total Raised To Date: ${currency(total)}</span>`;
+    }
+    function showTab(id){
+      document.querySelectorAll('section.card').forEach(s => s.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('tab-' + id);
+      if (btn) btn.classList.add('active');
+      renderAll();
+    }
+    function exportTableToCSV(filename, tableId){
+      const csv = []; const rows = document.querySelectorAll(`#${tableId} tr`);
+      for (let i=0;i<rows.length;i++){ const row=[], cols=rows[i].querySelectorAll('th,td');
+        for (let j=0;j<cols.length;j++){ let d = cols[j].innerText.replace(/\n/g,' ').replace(/\s+/g,' ').trim(); d = '"'+d.replace(/"/g,'""')+'"'; row.push(d); }
+        csv.push(row.join(',')); }
+      const file = new Blob([csv.join('\n')], {type:'text/csv'}); const link = document.createElement('a');
+      link.download = filename; link.href = URL.createObjectURL(file); document.body.appendChild(link); link.click(); link.remove();
+    }
+    function renderRawData(isAdmin){
+      const tbody = document.querySelector('#raw-data-table tbody'); tbody.innerHTML='';
+      rawData.forEach((row, i) => {
+        const del = isAdmin ? `<td data-label="Delete"><button onclick="deleteEntry(${i})">Delete</button></td>` : '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td data-label="Date">${row.Date}</td>
+                        <td data-label="Week Start">${row.Week_Start}</td>
+                        <td data-label="Week End">${row.Week_End}</td>
+                        <td data-label="Week Label">${row.Week_Label}</td>
+                        <td data-label="Name">${row.Name}</td>
+                        <td data-label="Amount">${currency(row.Amount)}</td>${del}`;
+        tbody.appendChild(tr);
+      });
+    }
+    function updateLeaderboard(){
+      const totals = {}; rawData.forEach(r => totals[r.Name]=(totals[r.Name]||0)+r.Amount);
+      const ranked = Object.entries(totals).map(([Name, Total])=>({Name,Total})).sort((a,b)=>b.Total-a.Total);
+      const tbody = document.querySelector('#leaderboard-table tbody'); tbody.innerHTML='';
+      ranked.forEach(({Name,Total}, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td data-label="Rank">${idx+1}</td><td data-label="Name">${Name}</td><td data-label="Total Contribution ($)">${currency(Total)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    function updateWeeklyTotals(){
+      const weekly = {};
+      rawData.forEach(r => { if(!weekly[r.Week_Label]) weekly[r.Week_Label]={Week_Start:r.Week_Start,Week_End:r.Week_End,Week_Label:r.Week_Label,Total:0}; weekly[r.Week_Label].Total+=r.Amount; });
+      const list = Object.values(weekly).sort((a,b)=> new Date(a.Week_Start)-new Date(b.Week_Start));
+      const tbody = document.querySelector('#weekly-totals-table tbody'); tbody.innerHTML='';
+      list.forEach(w => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td data-label="Week Start">${w.Week_Start}</td><td data-label="Week End">${w.Week_End}</td><td data-label="Week Label">${w.Week_Label}</td><td data-label="Total Amount ($)">${currency(w.Total)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    function renderAll(){ updateTotalRaised(); updateLeaderboard(); updateWeeklyTotals(); }
+
+    // Render raw data without admin actions
+    const deleteEntry = () => {}; // noop on public
+    document.addEventListener('DOMContentLoaded', () => { showTab('leaderboard'); renderRawData(false); });
+  </script>
+</body>
+</html>
